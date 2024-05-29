@@ -13,17 +13,17 @@ import { GenericData } from './data/data.type';
   standalone: true,
   imports: [EchartsComponent],
   template: `
-    <div style="display: flex; justify-content: center; gap: 10px">
-      <button style="width: 100px; height: 30px" (click)="date = '17/05'">
+    <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 10px">
+      <button style="width: 100px; height: 30px" [style.font-weight]="date === '17/05' ? 'bold' : 'normal'" (click)="date = '17/05'">
         17/05
       </button>
-      <button style="width: 100px; height: 30px" (click)="date = '21/05'">
+      <button style="width: 100px; height: 30px" [style.font-weight]="date === '21/05' ? 'bold' : 'normal'" (click)="date = '21/05'">
         21/05
       </button>
-      <button style="width: 100px; height: 30px" (click)="date = '22/05'">
+      <button style="width: 100px; height: 30px" [style.font-weight]="date === '22/05' ? 'bold' : 'normal'" (click)="date = '22/05'">
         22/05
       </button>
-      <button style="width: 100px; height: 30px" (click)="date = '23/05'">
+      <button style="width: 100px; height: 30px" [style.font-weight]="date === '23/05' ? 'bold' : 'normal'" (click)="date = '23/05'">
         23/05
       </button>
     </div>

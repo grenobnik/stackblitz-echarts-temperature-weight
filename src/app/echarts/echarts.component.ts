@@ -1,5 +1,5 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { EChartsOption } from 'echarts';
+import { EChartsOption, XAXisComponentOption } from 'echarts';
 import { NgxEchartsDirective, provideEcharts } from 'ngx-echarts';
 import { weightRenderer } from './weight.renderer';
 import { JsonPipe } from '@angular/common';
@@ -21,32 +21,66 @@ export class EchartsComponent implements OnChanges {
     darkMode: true,
     backgroundColor: 'fff',
     grid: [
-      { id: 'weight', left: '4%', bottom: '17%', width: '94%', height: '20%' },
-      { id: 'temperature', left: '4%', top: '4%', width: '94%', height: '69%' },
+      { id: 'grid-bottom', left: 50, right: 10, bottom: 50, height: 100 },
+      { id: 'grid-top', left: 50, right: 10, bottom: 100 },
     ],
-    xAxis: [
-      { type: 'time', gridId: 'weight', id: 'weight', show: true },
-      { type: 'time', gridId: 'temperature', id: 'temperature', show: false },
-    ],
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: {
+        type: 'line', snap: false, label: { show: false }, lineStyle: { color: '#E1951C ', type: 'solid', width: 2 }
+      },
+      position: function (pos, params, el, elRect, size) {
+        const obj = { top: 10 } as any;
+        obj[['left', 'right'][+(pos[0] < size.viewSize[0] / 2)]] = 30;
+        return obj;
+      },
+    },
+    axisPointer: {
+      link: { xAxisIndex: 'all' } as any,
+      label: {
+        backgroundColor: '#777'
+      }
+    },
     yAxis: [
-      { min: -20, max: 30, gridId: 'temperature', id: 'temperature' },
-      { show: false, min: 0, max: 50000, gridId: 'weight', id: 'weight' },
+      { min: -25, max: 25, gridId: 'grid-top', id: 'y-axis-temperature', axisLabel: { formatter: '{value} °C'}, splitLine: { lineStyle: { color: 'grey', type: 'dashed' } } },
+      { show: false, min: 0, max: 50000, gridId: 'grid-bottom', id: 'y-axis-weight' },
     ],
     series: [],
     dataZoom: [
       {
         type: 'slider',
-        xAxisId: ['weight', 'temperature'],
+        xAxisId: ['x-axis-weight', 'x-axis-temperature'],
+        showDetail: true,
+        showDataShadow: false,
       },
       {
         type: 'inside',
-        xAxisId: ['weight', 'temperature'],
+        xAxisId: ['y-axis-weight', 'x-axis-temperature'],
       },
     ],
   };
 
+  chartDataNavigator: (min: number, max: number) => XAXisComponentOption = (min, max) => ({
+    type: 'time', 
+    gridId: 'grid-bottom', 
+    show: true,
+    min, 
+    max, 
+    axisLine: { onZero: false, show: false }, 
+    offset: -140,
+    splitNumber: 23,
+    axisLabel: { formatter: '{H}', showMinLabel: false, showMaxLabel: false, fontSize: 16, margin: 5, padding: [0, 0, 0, 20] },
+    axisTick: { show: false }
+  })
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['data'] && this.data) {
+      const dataStartPoint = new Date(this.data[
+        'eco_tag_temperature_celsius:25c13ba0-bd93-4b01-9245-8673e46f251c'
+      ][0].startTime)
+      dataStartPoint.setHours(0,0,0,0)
+      const min= dataStartPoint.getTime();
+      const max = min + 1000 * 60 * 60 * 24
       const weightData = this.data['eco_axles_combined_weight_kg'].map(
         (dataPoint) => ({
           value: [dataPoint.startTime, dataPoint.endTime, dataPoint.value],
@@ -64,37 +98,40 @@ export class EchartsComponent implements OnChanges {
       }));
       this.chartOption = {
         ...this.chartOption,
+        xAxis: [
+          { type: 'time', gridId: 'grid-bottom', id: 'x-axis-weight', show: false, min, max },
+          { type: 'time', gridId: 'grid-top', id: 'x-axis-temperature', show: false, min, max },
+          this.chartDataNavigator(min, max)
+        ],
         series: [
           {
             type: 'line',
             smooth: true,
             data: t1Data,
             showSymbol: false,
-            color: 'blue',
-            lineStyle: { width: 4 },
-            xAxisId: 'temperature',
-            yAxisId: 'temperature',
-            dataGroupId: '1',
+            color: '#3BABF4',
+            lineStyle: { width: 3 },
+            xAxisId: 'x-axis-temperature',
+            yAxisId: 'y-axis-temperature',
           },
           {
             type: 'line',
             smooth: true,
             data: t2Data,
             showSymbol: false,
-            color: 'green',
-            lineStyle: { width: 4 },
-            xAxisId: 'temperature',
-            yAxisId: 'temperature',
+            color: 'lightgreen',
+            lineStyle: { width: 3 },
+            xAxisId: 'x-axis-temperature',
+            yAxisId: 'y-axis-temperature',
           },
           {
             type: 'custom',
             renderItem: weightRenderer,
             data: weightData,
             yAxisIndex: 1,
-            color: 'grey',
-            xAxisId: 'weight',
-            yAxisId: 'weight',
-            dataGroupId: '1',
+            color: 'yellow',
+            xAxisId: 'x-axis-weight',
+            yAxisId: 'y-axis-weight',
           },
         ],
       };
