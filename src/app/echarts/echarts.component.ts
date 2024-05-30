@@ -73,7 +73,7 @@ export class EchartsComponent implements OnChanges {
     axisLine: { onZero: false, lineStyle: { width: 3, color: '#fff' } }, 
     offset: -104,
     axisTick: { show: true, interval: 0, inside: true, lineStyle: { color: '#000', width: 4, cap: 'square' } },
-    axisLabel: { fontSize: 16, margin: -25, padding: [0, 0, 0, 0] },
+    axisLabel: { fontSize: 16, margin: -27, padding: [0, 0, 0, 0] },
     data: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',' 10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23']
   }
 
