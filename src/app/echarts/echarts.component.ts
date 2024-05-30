@@ -27,7 +27,7 @@ export class EchartsComponent implements OnChanges {
     tooltip: {
       trigger: 'axis',
       axisPointer: {
-        type: 'line', snap: false, label: { show: false }, lineStyle: { color: '#E1951C ', type: 'solid', width: 2 }
+        type: 'line', snap: false, label: { show: false }, lineStyle: { color: '#E1951C', type: 'solid', width: 2 }
       },
       position: function (pos, params, el, elRect, size) {
         const obj = { top: 10 } as any;
@@ -45,13 +45,18 @@ export class EchartsComponent implements OnChanges {
       { min: -25, max: 25, gridId: 'grid-top', id: 'y-axis-temperature', axisLabel: { formatter: '{value} °C'}, splitLine: { lineStyle: { color: 'grey', type: 'dashed' } } },
       { show: false, min: 0, max: 50000, gridId: 'grid-bottom', id: 'y-axis-weight' },
     ],
-    series: [],
     dataZoom: [
       {
         type: 'slider',
         xAxisId: ['x-axis-weight', 'x-axis-temperature'],
-        showDetail: true,
+        showDetail: false,
+        // textStyle: { color: '#E1951C', lineHeight: 40, height: 40 },
         showDataShadow: false,
+        borderColor: 'rgba(0,0,0,0)',
+        handleStyle: { color: '#E1951C', borderWidth: 1, borderColor: '#E1951C' },
+        moveHandleSize: 0,
+        brushSelect: false,
+        bottom: 12,
       },
       {
         type: 'inside',
@@ -60,18 +65,17 @@ export class EchartsComponent implements OnChanges {
     ],
   };
 
-  chartDataNavigator: (min: number, max: number) => XAXisComponentOption = (min, max) => ({
-    type: 'time', 
+  chartNavigator: XAXisComponentOption = {
+    id: 'x-axis-navigator',
+    type: 'category', 
     gridId: 'grid-bottom', 
     show: true,
-    min, 
-    max, 
-    axisLine: { onZero: false, show: false }, 
-    offset: -140,
-    splitNumber: 23,
-    axisLabel: { formatter: '{H}', showMinLabel: false, showMaxLabel: false, fontSize: 16, margin: 5, padding: [0, 0, 0, 20] },
-    axisTick: { show: false }
-  })
+    axisLine: { onZero: false, lineStyle: { width: 3, color: '#fff' } }, 
+    offset: -104,
+    axisTick: { show: true, interval: 0, inside: true, lineStyle: { color: '#000', width: 4, cap: 'square' } },
+    axisLabel: { fontSize: 16, margin: -25, padding: [0, 0, 0, 0] },
+    data: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',' 10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23']
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['data'] && this.data) {
@@ -101,7 +105,8 @@ export class EchartsComponent implements OnChanges {
         xAxis: [
           { type: 'time', gridId: 'grid-bottom', id: 'x-axis-weight', show: false, min, max },
           { type: 'time', gridId: 'grid-top', id: 'x-axis-temperature', show: false, min, max },
-          this.chartDataNavigator(min, max)
+          // this.chartDataNavigator(min, max)
+          this.chartNavigator
         ],
         series: [
           {
@@ -133,6 +138,7 @@ export class EchartsComponent implements OnChanges {
             xAxisId: 'x-axis-weight',
             yAxisId: 'y-axis-weight',
           },
+          { type: 'bar', data: [], xAxisId: 'x-axis-navigator', yAxisId: 'y-axis-weight'}
         ],
       };
     }
